@@ -1,0 +1,269 @@
+:root {
+  color-scheme: light;
+  --bg: #0b1220;
+  --panel: #111a2e;
+  --text: #e7eefc;
+  --muted: #a9b6d3;
+  --border: rgba(255, 255, 255, 0.12);
+  --accent: #4f8cff;
+  --danger: #ff5c6c;
+  --success: #43d19e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji",
+    "Segoe UI Emoji";
+  background: radial-gradient(1200px 800px at 20% -10%, rgba(79, 140, 255, 0.35), transparent 55%),
+    radial-gradient(900px 600px at 90% 0%, rgba(67, 209, 158, 0.22), transparent 50%),
+    var(--bg);
+  color: var(--text);
+}
+
+.container {
+  width: min(820px, calc(100% - 32px));
+  margin: 36px auto;
+  padding: 22px;
+  background: rgba(17, 26, 46, 0.78);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  backdrop-filter: blur(8px);
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 18px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 28px;
+  letter-spacing: 0.2px;
+}
+
+.subtle {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  color: #dce7ff;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+  white-space: nowrap;
+}
+
+.task-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.task-form input {
+  width: 100%;
+  height: 44px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.15);
+  color: var(--text);
+  outline: none;
+}
+
+.task-form input:focus {
+  border-color: rgba(79, 140, 255, 0.8);
+  box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.2);
+}
+
+.task-form button {
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 10px;
+  border: 1px solid rgba(79, 140, 255, 0.65);
+  background: rgba(79, 140, 255, 0.2);
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.task-form button:hover {
+  background: rgba(79, 140, 255, 0.28);
+}
+
+.controls {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.control {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.control label {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.control select {
+  height: 40px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.15);
+  color: var(--text);
+  outline: none;
+}
+
+button.secondary {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 600;
+}
+
+button.secondary:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.stats {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 10px 0 16px;
+}
+
+.task-section {
+  padding-top: 4px;
+}
+
+.task-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.task {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.task.completed {
+  opacity: 0.8;
+}
+
+.task .text {
+  word-break: break-word;
+  color: var(--text);
+}
+
+.task.completed .text {
+  text-decoration: line-through;
+  color: var(--muted);
+}
+
+.task input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--success);
+}
+
+.task-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.task-actions button {
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.task-actions button:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.task-actions button.danger {
+  border-color: rgba(255, 92, 108, 0.5);
+  background: rgba(255, 92, 108, 0.12);
+}
+
+.task-actions button.danger:hover {
+  background: rgba(255, 92, 108, 0.18);
+}
+
+.empty-state {
+  margin: 18px 0 0;
+  color: var(--muted);
+}
+
+.hint {
+  margin: 14px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+@media (max-width: 560px) {
+  .container {
+    margin: 16px auto;
+    padding: 16px;
+  }
+
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .task-form {
+    grid-template-columns: 1fr;
+  }
+
+  .task-actions button {
+    padding: 0 8px;
+  }
+}
+
