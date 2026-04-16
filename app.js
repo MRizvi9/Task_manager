@@ -1,5 +1,5 @@
 /* eslint-disable no-alert */
-const STORAGE_KEY = "task_manager_tasks_v1";
+const API_BASE = "";
 
 /** @type {{id: string, text: string, completed: boolean, createdAt: number}[]} */
 let tasks = [];
@@ -15,36 +15,30 @@ const els = {
   emptyState: document.getElementById("emptyState"),
 };
 
-function safeParseTasks(raw) {
-  if (!raw) return [];
-  try {
-    const data = JSON.parse(raw);
-    if (!Array.isArray(data)) return [];
-    return data
-      .filter((t) => t && typeof t === "object")
-      .map((t) => ({
-        id: typeof t.id === "string" ? t.id : uid(),
-        text: typeof t.text === "string" ? t.text : "",
-        completed: Boolean(t.completed),
-        createdAt: typeof t.createdAt === "number" ? t.createdAt : Date.now(),
-      }))
-      .filter((t) => t.text.trim().length > 0);
-  } catch {
-    return [];
+async function apiRequest(method, path, body) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+
+  if (!res.ok) {
+    let details = "";
+    try {
+      const data = await res.json();
+      details = data?.error ? String(data.error) : JSON.stringify(data);
+    } catch {
+      try {
+        details = await res.text();
+      } catch {
+        details = "";
+      }
+    }
+    throw new Error(details || `Request failed (${res.status})`);
   }
-}
 
-function loadTasks() {
-  tasks = safeParseTasks(localStorage.getItem(STORAGE_KEY));
-}
-
-function saveTasks() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
-}
-
-function uid() {
-  if (crypto && crypto.randomUUID) return crypto.randomUUID();
-  return `t_${Math.random().toString(16).slice(2)}_${Date.now().toString(16)}`;
+  if (res.status === 204) return null;
+  return res.json();
 }
 
 function announce(message) {
@@ -53,6 +47,11 @@ function announce(message) {
   window.setTimeout(() => {
     els.taskStatus.textContent = message;
   }, 50);
+}
+
+async function refreshTasks() {
+  tasks = await apiRequest("GET", "/api/tasks");
+  render();
 }
 
 function getFilteredTasks() {
@@ -84,11 +83,17 @@ function render() {
     checkbox.type = "checkbox";
     checkbox.id = checkboxId;
     checkbox.checked = task.completed;
-    checkbox.addEventListener("change", () => {
-      task.completed = checkbox.checked;
-      saveTasks();
-      render();
-      announce(task.completed ? "Marked complete" : "Marked active");
+    checkbox.addEventListener("change", async () => {
+      try {
+        await apiRequest("PATCH", `/api/tasks/${encodeURIComponent(task.id)}`, {
+          completed: checkbox.checked,
+        });
+        await refreshTasks();
+        announce(checkbox.checked ? "Marked complete" : "Marked active");
+      } catch (err) {
+        console.error(err);
+        announce("Update failed");
+      }
     });
 
     const textWrap = document.createElement("div");
@@ -120,35 +125,27 @@ function render() {
   }
 }
 
-function addTask(text) {
+async function addTask(text) {
   const trimmed = text.trim();
   if (!trimmed) return;
 
-  tasks.push({
-    id: uid(),
-    text: trimmed,
-    completed: false,
-    createdAt: Date.now(),
-  });
-
-  saveTasks();
-  render();
+  await apiRequest("POST", "/api/tasks", { text: trimmed });
+  await refreshTasks();
   announce("Task added");
 }
 
-function deleteTask(id) {
+async function deleteTask(id) {
   const task = tasks.find((t) => t.id === id);
   if (!task) return;
   const ok = window.confirm(`Delete "${task.text}"?`);
   if (!ok) return;
 
-  tasks = tasks.filter((t) => t.id !== id);
-  saveTasks();
-  render();
+  await apiRequest("DELETE", `/api/tasks/${encodeURIComponent(id)}`);
+  await refreshTasks();
   announce("Task deleted");
 }
 
-function editTask(id) {
+async function editTask(id) {
   const task = tasks.find((t) => t.id === id);
   if (!task) return;
 
@@ -158,36 +155,45 @@ function editTask(id) {
   const trimmed = next.trim();
   if (!trimmed) return; // Keep original if blank.
 
-  task.text = trimmed;
-  saveTasks();
-  render();
+  await apiRequest("PUT", `/api/tasks/${encodeURIComponent(id)}`, { text: trimmed });
+  await refreshTasks();
   announce("Task updated");
 }
 
-function clearCompleted() {
-  const before = tasks.length;
-  tasks = tasks.filter((t) => !t.completed);
-  const removed = before - tasks.length;
-  if (removed > 0) {
-    saveTasks();
-    render();
-    announce("Cleared completed tasks");
+async function clearCompleted() {
+  try {
+    const result = await apiRequest("DELETE", "/api/tasks/completed");
+    await refreshTasks();
+    const removed = result?.removed ?? 0;
+    if (removed > 0) announce("Cleared completed tasks");
+  } catch (err) {
+    console.error(err);
+    announce("Clear failed");
   }
 }
 
-function init() {
-  loadTasks();
-  render();
-
-  els.taskForm.addEventListener("submit", (e) => {
+async function init() {
+  els.taskForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    addTask(els.taskInput.value);
-    els.taskInput.value = "";
-    els.taskInput.focus();
+    try {
+      await addTask(els.taskInput.value);
+      els.taskInput.value = "";
+      els.taskInput.focus();
+    } catch (err) {
+      console.error(err);
+      announce("Add failed");
+    }
   });
 
   els.filter.addEventListener("change", () => render());
   els.clearCompleted.addEventListener("click", clearCompleted);
+
+  try {
+    await refreshTasks();
+  } catch (err) {
+    console.error(err);
+    announce("Could not load tasks");
+  }
 }
 
 init();

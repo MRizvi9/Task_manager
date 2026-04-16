@@ -1,0 +1,10 @@
+# Python / Flask
+backend/tasks.db
+backend/__pycache__/
+__pycache__/
+*.pyc
+
+# Virtual environments
+venv/
+.venv/
+

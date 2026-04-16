@@ -2,7 +2,10 @@
 This is my University Web development project.
 
 ## Run
-No build step is required.
+Backend is included (Python + Flask) and serves the frontend.
 
-1. Open `index.html` in your browser.
-2. Tasks are saved automatically in your browser using `localStorage`.
+1. Install dependencies:
+   - `python -m pip install -r backend/requirements.txt`
+2. Start the server:
+   - `python backend/app.py`
+3. Open: `http://localhost:8080`
