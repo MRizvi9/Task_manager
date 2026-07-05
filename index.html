@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Task Manager</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script defer src="./app.js"></script>
+  </head>
+  <body>
+    <main class="container">
+      <header class="header">
+        <h1>Task Manager</h1>
+        <p class="subtle">Simple JavaScript + <code>localStorage</code></p>
+      </header>
+
+      <form id="taskForm" class="task-form" autocomplete="off">
+        <label class="sr-only" for="taskInput">New task</label>
+        <input
+          id="taskInput"
+          name="task"
+          type="text"
+          placeholder="What do you need to do?"
+          required
+          maxlength="200"
+        />
+        <button type="submit">Add</button>
+      </form>
+
+      <section class="controls" aria-label="Task controls">
+        <div class="control">
+          <label for="filter">Filter</label>
+          <select id="filter">
+            <option value="all" selected>All</option>
+            <option value="active">Active</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+
+        <button id="clearCompleted" type="button" class="secondary" title="Remove all completed tasks">
+          Clear completed
+        </button>
+      </section>
+
+      <div id="stats" class="stats" aria-live="polite"></div>
+      <div id="taskStatus" class="sr-only" aria-live="polite"></div>
+
+      <section class="task-section">
+        <h2 class="sr-only">Tasks</h2>
+        <ul id="taskList" class="task-list"></ul>
+        <p id="emptyState" class="empty-state" hidden>No tasks yet. Add one above!</p>
+      </section>
+    </main>
+  </body>
+</html>
+
